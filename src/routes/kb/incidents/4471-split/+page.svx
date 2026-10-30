@@ -1,0 +1,61 @@
+---
+layout: runbook
+title: '#4471 · three problems, not one'
+owner: Ludwig Gérard-Wirén
+status: open
+reviewed: 2026-10-30
+signature: Ludwig Gérard-Wirén
+---
+
+<script>
+  import SplitTable from '#lib/kb/SplitTable.svelte';
+  import ProblemCount from '#lib/kb/ProblemCount.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+</script>
+
+[#4471](/kb/incidents/4471) is marked known: one parser bug, one fix queued. The reports in it
+show three problems. Each problem needs its own fix, so each problem now has its own ticket.
+
+<Callout kind="warn">
+The queued parser fix closes only the parser reports. The other two problems stay open after it ships.
+</Callout>
+
+## The split
+
+<SplitTable ticket={4471} />
+
+The table reads the same export as the #4471 page. Each report counts once, by its id.
+The counts change when the desk merges more reports.
+
+## How a report is placed
+
+1. **`shift`**: the desk read the report as a one-day move (`desk-notes.json`, `oneDayMove`).
+   The day of the month is kept, but the invite lands one day early. The bodies say
+   "Tuesday 12 May. Calendar says Monday 11 May" and "Client in Lisbon got Tuesday. Client in
+   Toronto got Monday". A month/day flip cannot make this. Look for a time zone conversion.
+2. **`hint`**: a day-first tenant on `booking-v3`, through the form. The form prints
+   `MM/DD/YYYY` under the date field, so people type the month first, and the form then reads
+   the date day first. The parser fix does not touch this.
+3. **`parser`**: any other report from a day-first tenant. The shared parser reads every date
+   month first, so 7 April becomes 4 July.
+
+The tenant decides the cause, not the intake tag. Intake guesses `hint` from an `en-US` browser,
+and that guess is wrong in both directions: the [#4471 page](/kb/incidents/4471) shows the tags
+under each cause.
+
+## Why one ticket hid three
+
+- [Decision 0001](/kb/decisions/0001-dedupe-by-subject) merges on the subject line. All three
+  problems produce the same subjects: "Wrong day on the invite", "Date is wrong".
+- The <ProblemCount ticket={4471} problem="shift" /> one-day reports were noted, then counted
+  under `parser` by tenant. A footnote is not a ticket.
+- The <ProblemCount ticket={4471} problem="hint" /> `hint` reports were marked "not this
+  ticket", but nobody opened a ticket for them.
+
+## What to do
+
+- Track each fix on its own ticket (links in the table). Close #4471 only when all three close.
+- Merge a new date report by its tenant, form and channel, with the rules above. Not by subject.
+
+<RenderStamp {signature} />

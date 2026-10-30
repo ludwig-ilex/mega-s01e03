@@ -1,0 +1,8 @@
+{
+  "ticket": 4471,
+  "issues": {
+    "parser": { "url": "https://github.com/ludwig-ilex/mega-s01e03/issues/1", "title": "Shared parser reads day-first dates month first" },
+    "hint": { "url": "https://github.com/ludwig-ilex/mega-s01e03/issues/2", "title": "booking-v3 form prints MM/DD/YYYY but reads day-first" },
+    "shift": { "url": "https://github.com/ludwig-ilex/mega-s01e03/issues/3", "title": "Invites land one day early" }
+  }
+}
