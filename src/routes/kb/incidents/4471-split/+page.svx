@@ -2,7 +2,7 @@
 layout: runbook
 title: '#4471 · three problems, not one'
 owner: Ludwig Gérard-Wirén
-status: open
+status: closed
 reviewed: 2026-10-30
 signature: Ludwig Gérard-Wirén
 ---
@@ -18,7 +18,7 @@ signature: Ludwig Gérard-Wirén
 show three problems. Each problem needs its own fix, so each problem now has its own ticket.
 
 <Callout kind="warn">
-The queued parser fix closes only the parser reports. The other two problems stay open after it ships.
+The parser fix closed only the parser reports. The other two problems needed their own decisions.
 </Callout>
 
 ## The split
@@ -54,9 +54,17 @@ under each cause.
 - The <ProblemCount ticket={4471} problem="hint" /> `hint` reports were marked "not this
   ticket", but nobody opened a ticket for them.
 
+## Outcome
+
+Engineering closed #4471 on 5 October.
+
+- `parser`: fixed, `fix(dates): parse dd/mm for eu locales`. Ticket closed as completed.
+- `hint`: won't fix, the booking-v3 form is retired. Ticket closed as not planned.
+- `shift`: no fix. Ticket closed as not planned with #4471. The one-day moves are still not
+  explained: reopen the ticket when a new one comes in.
+
 ## What to do
 
-- Track each fix on its own ticket (links in the table). Close #4471 only when all three close.
 - Merge a new date report by its tenant, form and channel, with the rules above. Not by subject.
 
 <RenderStamp {signature} />
