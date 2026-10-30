@@ -1,4 +1,4 @@
-// Writes one issue body per problem in #4471 to issues/. Counts as the desk's CauseTable does: `shift` reports stay in their cause too.
+// Writes one issue body per problem in #4471 to issues/. Same rules as src/lib/kb/split.ts.
 import fs from 'node:fs';
 import { causeOf, uniqueById, type Report, type Tenant } from '../src/lib/kb/causes.ts';
 
@@ -10,13 +10,11 @@ const tenants = new Map<string, Tenant>(
 );
 
 const merged = uniqueById(reports).filter((r) => r.mergedInto === 4471);
-const groups: Record<string, Report[]> = {
-  ...Object.groupBy(merged, (r) => causeOf(r, tenants.get(r.tenant)) ?? 'unplaced'),
-  shift: merged.filter((r) => oneDayMove.includes(r.id)),
-};
+const problemOf = (r: Report) => (oneDayMove.includes(r.id) ? 'shift' : causeOf(r, tenants.get(r.tenant)) ?? 'unplaced');
+const groups = Object.groupBy(merged, problemOf);
 
 const RULE: Record<string, string> = {
-  parser: 'A report from a day-first tenant that is not `hint`. The shared parser reads every date month first. As in the desk\'s CauseTable, this count includes the `shift` reports filed here by tenant.',
+  parser: 'A report from a day-first tenant that is not `hint` and not `shift`. The shared parser reads every date month first.',
   hint: 'A report through the form (`channel: form`) from a day-first tenant on `booking-v3`. That form prints `MM/DD/YYYY` under the date field, then reads the date day first.',
   shift: 'A report the desk read as a one-day move (`desk-notes.json`, `oneDayMove`). The invite keeps the date order but lands one day early.',
 };
