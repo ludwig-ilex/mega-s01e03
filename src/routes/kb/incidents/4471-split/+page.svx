@@ -25,8 +25,9 @@ The queued parser fix closes only the parser reports. The other two problems sta
 
 <SplitTable ticket={4471} />
 
-The table reads the same export as the #4471 page. Each report counts once, by its id.
-The counts change when the desk merges more reports.
+The table counts as the [#4471 page](/kb/incidents/4471) does, from the same export. Each report
+counts once, by its id, under its cause. The `shift` reports stay under the cause their tenant
+files them in, and they also get their own ticket. The counts change when the desk merges more reports.
 
 ## How a report is placed
 
@@ -48,8 +49,8 @@ under each cause.
 
 - [Decision 0001](/kb/decisions/0001-dedupe-by-subject) merges on the subject line. All three
   problems produce the same subjects: "Wrong day on the invite", "Date is wrong".
-- The <ProblemCount ticket={4471} problem="shift" /> one-day reports were noted, then counted
-  under `parser` by tenant. A footnote is not a ticket.
+- The <ProblemCount ticket={4471} problem="shift" /> one-day reports were noted in a footnote under
+  `parser`. A footnote is not a ticket.
 - The <ProblemCount ticket={4471} problem="hint" /> `hint` reports were marked "not this
   ticket", but nobody opened a ticket for them.
 

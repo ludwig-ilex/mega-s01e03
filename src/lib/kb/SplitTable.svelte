@@ -15,18 +15,16 @@
 <p class="sum">
   <strong>{result.merged}</strong> reports merged into #{ticket} ·
   <strong>{result.rows.length}</strong>
-  {result.rows.length === 1 ? 'problem' : 'problems'}
+  {result.rows.length === 1 ? 'problem' : 'problems'}, one ticket each
 </p>
 
 <table>
-  <thead><tr><th>problem</th><th>reports</th><th>tenants</th><th>seen</th><th>ticket</th></tr></thead>
+  <thead><tr><th>problem</th><th>reports</th><th>ticket</th></tr></thead>
   <tbody>
     {#each result.rows as row (row.problem)}
       <tr class:unplaced={!issue(row.problem)}>
         <td><code>{row.problem}</code></td>
-        <td>{row.reports.length}</td>
-        <td>{row.tenants}</td>
-        <td>{row.firstSeen} → {row.lastSeen}</td>
+        <td>{row.reports}{#if row.filedUnder}<span class="under"> · also in <code>{row.filedUnder}</code></span>{/if}</td>
         <td>
           {#if issue(row.problem)}<a href={issue(row.problem).url}>{issue(row.problem).title}</a>{:else}no ticket yet{/if}
         </td>
@@ -37,5 +35,6 @@
 
 <style>
   .sum { font-size: 1.1rem; }
+  .under { color: var(--muted); font-size: 0.85em; }
   .unplaced td { background: var(--warn-bg); color: var(--warn); }
 </style>

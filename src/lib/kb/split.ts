@@ -1,14 +1,10 @@
-// The problems inside a merged ticket, one per fix. Built on causes.ts; the desk's reading wins over the tenant.
-import { causeOf, uniqueById, type Cause, type Report, type Tenant } from '#lib/kb/causes';
+// The problems inside a merged ticket, one ticket each. Counted as the desk's CauseTable does.
+import { groupByCause, readAs, uniqueById, type Cause, type Report, type Tenant } from '#lib/kb/causes';
 
-// `shift`: the date is kept but lands one day early (desk-notes.json, `oneDayMove`). Not a month/day flip.
-export type Problem = Cause | 'shift';
+// `shift`: the date lands one day early (desk-notes.json, `oneDayMove`). The desk files these under their cause by tenant.
+export type Problem = Cause | 'unplaced' | 'shift';
 
-export function problemOf(r: Report, t: Tenant | undefined, oneDayMove: readonly string[]): Problem | null {
-  return oneDayMove.includes(r.id) ? 'shift' : causeOf(r, t);
-}
-
-export type ProblemRow = { problem: Problem | 'unplaced'; reports: Report[]; tenants: number; firstSeen: string; lastSeen: string };
+export type ProblemRow = { problem: Problem; reports: number; filedUnder?: Cause | 'unplaced' };
 
 export function splitTicket(
   all: Report[],
@@ -17,16 +13,7 @@ export function splitTicket(
   oneDayMove: readonly string[],
 ): { merged: number; rows: ProblemRow[] } {
   const merged = uniqueById(all).filter((r) => r.mergedInto === ticket);
-  const by = new Map<ProblemRow['problem'], Report[]>();
-  for (const r of merged) {
-    const p = problemOf(r, tenantOf(r), oneDayMove) ?? 'unplaced';
-    by.set(p, [...(by.get(p) ?? []), r]);
-  }
-  const rows = [...by.entries()]
-    .map(([problem, rs]) => {
-      const days = rs.map((r) => r.receivedAt.slice(0, 10)).sort();
-      return { problem, reports: rs, tenants: new Set(rs.map((r) => r.tenant)).size, firstSeen: days[0], lastSeen: days[days.length - 1] };
-    })
-    .sort((a, b) => b.reports.length - a.reports.length);
-  return { merged: merged.length, rows };
+  const groups = groupByCause(merged, tenantOf);
+  const shifts = groups.flatMap((g) => (readAs(g, oneDayMove) ? [{ problem: 'shift' as const, reports: readAs(g, oneDayMove), filedUnder: g.cause }] : []));
+  return { merged: merged.length, rows: [...groups.map((g) => ({ problem: g.cause, reports: g.reports.length })), ...shifts] };
 }

@@ -8,7 +8,7 @@
   // Inline count of one problem in a ticket: <ProblemCount ticket={4471} problem="hint" />
   let { ticket, problem }: { ticket: number; problem: Problem } = $props();
 
-  const n = $derived(splitTicket(reports as Report[], ticket, tenantOf, notes.oneDayMove).rows.find((r) => r.problem === problem)?.reports.length ?? 0);
+  const n = $derived(splitTicket(reports as Report[], ticket, tenantOf, notes.oneDayMove).rows.find((r) => r.problem === problem)?.reports ?? 0);
 </script>
 
 <strong>{n}</strong>
