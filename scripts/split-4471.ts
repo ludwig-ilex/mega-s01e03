@@ -1,4 +1,4 @@
-// Writes one issue body per problem in #4471 to issues/. Same rules as src/lib/kb/split.ts.
+// Writes one issue body per problem in #4471 to issues/. Counts as the desk's CauseTable does; each id is listed in one issue only.
 import fs from 'node:fs';
 import { causeOf, uniqueById, type Report, type Tenant } from '../src/lib/kb/causes.ts';
 
@@ -19,10 +19,16 @@ const RULE: Record<string, string> = {
   shift: 'A report the desk read as a one-day move (`desk-notes.json`, `oneDayMove`). The invite keeps the date order but lands one day early.',
 };
 
+// `shift` reports the desk files under a cause by tenant: counted there, listed in the shift issue.
+const filedUnder = (problem: string) =>
+  problem === 'shift' ? 0 : (groups.shift ?? []).filter((r) => causeOf(r, tenants.get(r.tenant)) === problem).length;
+
 for (const [problem, rs] of Object.entries(groups)) {
   const days = rs!.map((r) => r.receivedAt.slice(0, 10)).sort();
+  const also = filedUnder(problem);
   const body = [
-    `**${rs!.length} reports** from #4471.`,
+    `**${rs!.length + also} reports** from #4471.`,
+    ...(also ? ['', `This count is the desk's CauseTable count. It includes ${also} \`shift\` reports that the desk files here by tenant. Their ids are listed in the shift issue, not here.`] : []),
     '',
     `**Rule:** ${RULE[problem] ?? 'No rule places these reports.'}`,
     '',
@@ -36,5 +42,5 @@ for (const [problem, rs] of Object.entries(groups)) {
     '</details>',
   ].join('\n');
   fs.writeFileSync(`issues/${problem}.md`, body + '\n');
-  console.log(problem, rs!.length);
+  console.log(problem, rs!.length + also, 'ids', rs!.length);
 }

@@ -1,4 +1,6 @@
-**374 reports** from #4471.
+**379 reports** from #4471.
+
+This count is the desk's CauseTable count. It includes 5 `shift` reports that the desk files here by tenant. Their ids are listed in the shift issue, not here.
 
 **Rule:** A report from a day-first tenant that is not `hint` and not `shift`. The shared parser reads every date month first.
 
